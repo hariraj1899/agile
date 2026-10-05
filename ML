@@ -1,0 +1,55 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+
+# 1. Load the CSV
+df = pd.read_csv("instagram_visits.csv")
+
+# 2. Select features for clustering
+X = df[['Instagram visit score', 'Spending_rank(0 to 100)']]
+
+# 3. Standardize the data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 4. Apply K-Means with 3 clusters
+kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+
+df['Cluster'] = kmeans.fit_predict(X_scaled)
+
+# 5. Display the grouped data
+print("Clustered Data:")
+print(df)
+
+# 6. Group users according to their cluster
+print("\nGroup 0:")
+print(df[df['Cluster'] == 0])
+
+print("\nGroup 1:")
+print(df[df['Cluster'] == 1])
+
+print("\nGroup 2:")
+print(df[df['Cluster'] == 2])
+
+# 7. Plot the clusters
+plt.figure(figsize=(8, 6))
+
+plt.scatter(
+    df['Instagram visit score'],
+    df['Spending_rank(0 to 100)'],
+    c=df['Cluster']
+)
+
+plt.xlabel('Instagram Visit Score')
+plt.ylabel('Spending Rank')
+plt.title('K-Means Clustering - 3 Clusters')
+
+plt.show()
+
+# 8. Silhouette Score evaluation
+silhouette = silhouette_score(X_scaled, df['Cluster'])
+
+print("\nSilhouette Score:", silhouette)
